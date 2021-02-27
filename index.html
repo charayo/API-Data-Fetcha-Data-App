@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body class="">
+    <div class="container-fluid text-center">
+        <div class=" card p-5 mt-3">
+            <div class="left-inputCol" style="text-align: center;">
+                <input type="text" placeholder="Name" class="form-control mb-3" id="ayo">
+                <input type="text" placeholder="Username" class="form-control mb-3" id="usernameInput">
+                <input type="text" placeholder="Email" class="form-control mb-3" id="emailInput">
+                <input type="text" placeholder="Address" class="form-control mb-3" id="addressInput">
+                <input type="text" placeholder="Phone No" class="form-control mb-3" id="phoneInput">
+                <input type="text" placeholder="Website" class="form-control mb-3" id="websiteInput">
+                <input type="text" placeholder="Company Name" class="form-control mb-3" id="companyInput">
+                <input type="button" value="ADD USER" class="btn bg-primary" style="color: white;" id="btn">
+                <input type="button" value="FETCH FROM DATABASE" class="btn bg-primary" style="color: white;"
+                    id="btnFetch">
+            </div>
+            <div class="container mt-3">
+                <input type="text" id="srchInput" class="">
+                <input type="button" value="Search" id="srchBtn" class="btn btn-secondary ">
+            </div>
+        </div>
+        <div id="resultField" class="mt-5 text-center">
+            <table class="table table-striped table-dark">
+                <thead class="thead-light">
+                    <tr>
+                        <th>S/N</th>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                        <th>Phone No</th>
+                        <th>Website</th>
+                        <th>Company Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tBody" class="">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        let myData = [];
+        let tBody = document.getElementById("tBody");
+        let DB = fetch('https://jsonplaceholder.typicode.com/users')
+            .then(response => response.json())
+            .then(data => {
+                myData = data;
+            })
+        let newEvId, newDesId, nameInput, descInput;
+        let btn = document.getElementById('btn');
+        let cache = {};
+        let compare;
+
+        //Creating a function that gets input values and store them in an array as object-------
+        function getValue() {
+            let obj = {
+                name: ayo.value,
+                username: usernameInput.value,
+                email: emailInput.value,
+                address: {
+                    street: addressInput.value
+                },
+                website: websiteInput.value,
+                phone: phoneInput.value,
+                company: {
+                    name: companyInput.value
+                }
+
+            }
+            myData.push(obj)
+        }
+
+        function del(anc) {
+            if (compare!="done"){
+            myData.splice(anc, 1);
+            findPrint()
+            } else { tBody.innerHTML ="";}
+        }
+
+        function drawTable(para, i, btnNm ){
+                tBody.innerHTML +=
+                    `<tr>
+                            <td><div id="SN"><span>${i+1}</span></div></td>
+                            <td><div><p id="">${para.name}</p</div></td>
+                            <td><div ><p id="">${para.username}</p</div></td>
+                            <td><div ><p id="">${para.email}</p</div></td>
+                            <td><div ><p id="">${para.address.street}</p</div></td>
+                            <td><div ><p id="">${para.phone}</p</div></td>
+                            <td><div ><p id="">${para.website}</p</div></td>
+                            <td><div ><p id="">${para.company.name}</p</div></td>
+                            <td><input type="button" value="${btnNm}" class="btn bg-danger " onClick= del(${i})></td>
+                        </tr>`;
+        }
+
+        let findPrint = () => {
+            tBody.innerHTML = "";
+            myData.forEach(function (ram, i) {
+                drawTable(ram,i,"DEL");
+            })
+        }
+
+        btnFetch.addEventListener('click', findPrint);
+        function addUser() {
+            getValue();
+            console.log(myData)
+            findPrint();
+        }
+        btn.addEventListener('click', addUser);
+       
+
+        let srch = () => {
+            myData.forEach(element => {
+                if (srchInput.value == element.name) {
+                    cache = element;
+                    compare = "done";
+                }
+            });
+
+            if (compare == "done") {
+                tBody.innerHTML = "";
+                drawTable(cache,0,"CLR");               
+            } else {
+                tBody.innerHTML = "Not found";
+            }
+        };
+        srchBtn.addEventListener('click', srch);
+    </script>
+</body>
+</html>
